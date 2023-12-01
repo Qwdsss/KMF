@@ -20,19 +20,24 @@ logger = logging.getLogger(__name__)
 #     return render(request, 'registration/register_step1.html', {'form': form})
 
 
+# Функция отображения главной страницы
 def home(request):
+    # Получаем имя пользователя, если он аутентифицирован
     user_name = request.user.name if request.user.is_authenticated else None
 
+    # Обработка выхода пользователя
     if request.method == 'POST' and 'logout' in request.POST:
         logout(request)
 
     return render(request, 'home.html', {'user_name': user_name})
 
 
+# Шаг 1 регистрации: ввод email и номера телефона
 def register_step1(request):
     if request.method == 'POST':
         form = RegistrationStep1Form(request.POST)
         if form.is_valid():
+            # Сохраняем данные в сессии
             request.session['registration_data'] = {
                 'email': form.cleaned_data['email'],
                 'phone_number': form.cleaned_data['phone_number'],
@@ -43,10 +48,12 @@ def register_step1(request):
     return render(request, 'registration/register_step1.html', {'form': form})
 
 
+# Шаг 2 регистрации: ввод кода из SMS
 def register_step2(request):
     if request.method == 'POST':
         form = RegistrationStep2Form(request.POST)
         if form.is_valid():
+            # Проверка введенного SMS кода
             if form.cleaned_data['sms_code'] == '123456':
                 return redirect('register_step3')
             else:
@@ -58,10 +65,12 @@ def register_step2(request):
     return render(request, 'registration/register_step2.html', {'form': form})
 
 
+# Шаг 3 регистрации: ввод имени, типа бизнеса и пола
 def register_step3(request):
     if request.method == 'POST':
         form = RegistrationStep3Form(request.POST)
         if form.is_valid():
+            # Обновляем данные в сессии
             registration_data = request.session.get('registration_data', {})
             registration_data.update({
                 'name': form.cleaned_data.get('name'),
@@ -77,7 +86,9 @@ def register_step3(request):
     return render(request, 'registration/register_step3.html', {'form': form})
 
 
+# Шаг 4 регистрации: ввод пароля
 def register_step4(request):
+    # Выводим данные из сессии в консоль (для отладки)
     if 'registration_data' in request.session:
         print(request.session['registration_data'])
 
@@ -87,6 +98,7 @@ def register_step4(request):
             password = form.cleaned_data['password1']
             confirm_password = form.cleaned_data['password2']
 
+            # Создаем пользователя и аутентифицируем его
             if password == confirm_password:
                 user = CustomUser.objects.create_user(
                     username=request.session['registration_data']['email'],
@@ -99,9 +111,9 @@ def register_step4(request):
                 )
 
                 login(request, user)
-
+                # Сохраняем данные в сессии перед удалением
                 registration_data = request.session.pop('registration_data', None)
-
+                # Проверяем сохраненные данные
                 print('Data after creating user:', registration_data)
 
                 return redirect('home')
@@ -113,6 +125,7 @@ def register_step4(request):
     return render(request, 'registration/register_step4.html', {'form': form})
 
 
+# Вход пользователя
 def login_view(request):
     if request.method == 'POST':
         form = CustomAuthenticationForm(request, request.POST)
