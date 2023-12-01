@@ -1,0 +1,10 @@
+{% block content %}
+  <h2>Registration - Step 2</h2>
+  <form method="post" action="{% url 'register_step2' %}">
+    {% csrf_token %}
+    <label for="sms_code">Enter SMS Code:</label>
+    <input type="text" name="sms_code" required>
+    <br>
+    <button type="submit">Next</button>
+  </form>
+{% endblock %}

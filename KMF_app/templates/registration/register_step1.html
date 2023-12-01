@@ -1,0 +1,6 @@
+ <h2>Registration - Step 1</h2>
+ <form method="post" action="{% url 'register_step1' %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Next</button>
+ </form>

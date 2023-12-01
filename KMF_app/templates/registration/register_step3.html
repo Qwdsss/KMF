@@ -1,0 +1,16 @@
+{% block content %}
+  <h2>Registration - Step 3</h2>
+  <form method="post" action="{% url 'register_step3' %}">
+    {% csrf_token %}
+    {{ form.name.label_tag }}
+    {{ form.name }}
+    <br>
+    {{ form.business_type.label_tag }}
+    {{ form.business_type }}
+    <br>
+    {{ form.gender.label_tag }}
+    {{ form.gender }}
+    <br>
+    <button type="submit">Next</button>
+  </form>
+{% endblock %}
